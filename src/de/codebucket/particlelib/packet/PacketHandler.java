@@ -39,7 +39,7 @@ public class PacketHandler
 		setValue(packet, "f", Float.valueOf(new Random().nextFloat()));
 		setValue(packet, "g", Float.valueOf(new Random().nextFloat()));
 		setValue(packet, "h", Float.valueOf(particle.getDefaultSpeed()));
-		setValue(packet, "i", Float.valueOf(particle.getParticleAmount()));
+		setValue(packet, "i", Integer.valueOf(particle.getParticleAmount()));
 		
 		sendPacket(player, packet);
 	}
