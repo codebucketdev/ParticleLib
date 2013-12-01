@@ -1,90 +1,48 @@
 package de.codebucket.particlelib.packet;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-import de.codebucket.particlelib.packet.NMSPacket;
 import de.codebucket.particlelib.Main;
 import de.codebucket.particlelib.Particle;
 
 public class PacketHandler 
 {
 	Main plugin;
-	private String version = "";
 	
 	public PacketHandler(Main plugin)
 	{
 		this.plugin = plugin;
-		this.version = plugin.getServerVersion();
 	}
 	
 	public void sendWorldPacket(Player player, Location location, Particle particle) throws Exception
 	{
-		NMSPacket packet = null;
+		Object packet = java.lang.Class.forName("net.minecraft.server." + getVersionString() + ".Packet63WorldParticles").getConstructors()[0].newInstance(new Object[0]);
 		
-		try 
-		{
-			packet = new NMSPacket("Packet63WorldParticles");
-		} 
-		catch (InstantiationException e) 
-		{
-			plugin.getLogger().severe("Unknown or unsupported CraftBukkit version! Is the Plugin up to date?");
-			plugin.getLogger().severe(e.getMessage());
-		} 
-		catch (IllegalAccessException e) 
-		{
-			plugin.getLogger().severe("Unknown or unsupported CraftBukkit version! Is the Plugin up to date?");
-			plugin.getLogger().severe(e.getMessage());
-		} 
-		catch (ClassNotFoundException e) 
-		{
-			plugin.getLogger().severe("Unknown or unsupported CraftBukkit version! Is the Plugin up to date?");
-			plugin.getLogger().severe(e.getMessage());
-		}
-		
-		packet.setDeclaredField("a", particle.getParticleName());
-		packet.setDeclaredField("b", (float) location.getX());
-		packet.setDeclaredField("c", (float) location.getY());
-		packet.setDeclaredField("d", (float) location.getZ());
-		packet.setDeclaredField("e", new Random().nextFloat());
-		packet.setDeclaredField("f", new Random().nextFloat());
-		packet.setDeclaredField("g", new Random().nextFloat());
-		packet.setDeclaredField("h", particle.getDefaultSpeed());
-		packet.setDeclaredField("i", particle.getParticleAmount());
+		setValue(packet, "a", particle.getParticleName());
+		setValue(packet, "b", Float.valueOf((float)location.getX()));
+		setValue(packet, "c", Float.valueOf((float)location.getY()));
+		setValue(packet, "d", Float.valueOf((float)location.getZ()));
+		setValue(packet, "e", Float.valueOf(new Random().nextFloat()));
+		setValue(packet, "f", Float.valueOf(new Random().nextFloat()));
+		setValue(packet, "g", Float.valueOf(new Random().nextFloat()));
+		setValue(packet, "h", Float.valueOf(particle.getDefaultSpeed()));
+		setValue(packet, "i", Float.valueOf(particle.getParticleAmount()));
 		
 		sendPacket(player, packet);
 	}
-	
-	public void sendPacket(Player player, Object o)
-    {
-	    try 
-	    {
-		    Class<?> packet = Class.forName("net.minecraft.server." + version + ".Packet");
-		    Class<?> craftPlayer = Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer");
-		    
-		    if(!packet.isAssignableFrom(o.getClass()))
-		    {
-			    throw new IllegalArgumentException("Object o wasn't a packet!");
-		    }
-		    
-		    Object cp = craftPlayer.cast(player);
-		    Object handle = craftPlayer.getMethod("getHandle").invoke(cp);
-		    Object con = handle.getClass().getField("playerConnection").get(handle);
-		    con.getClass().getMethod("sendPacket", packet).invoke(con, o);
-        } 
-	    catch (Exception e)
-	    {
-		    plugin.getLogger().severe("An error has occurred whilst sending the packets. Is Bukkit up to date?");
-		    plugin.getLogger().severe(e.getMessage());
-	    }
-    }
 	
 	public void sendFireworkPacket(World world, Location location, FireworkEffect effect) throws Exception 
 	{
@@ -101,7 +59,6 @@ public class PacketHandler
 			world_getHandle = getMethod(world.getClass(), "getHandle");
 			firework_getHandle = getMethod(fw.getClass(), "getHandle");
 		}
-		
 		
 		nms_world = world_getHandle.invoke(world, (Object[]) null);
 		nms_firework = firework_getHandle.invoke(fw, (Object[]) null);
@@ -122,15 +79,84 @@ public class PacketHandler
 		fw.remove();
 	}
 	
-	private static Method getMethod(Class<?> cl, String method)
+	public Method getMethod(Class<?> cl, String method)
 	{
-		for(Method m : cl.getMethods()) 
-		{
-			if(m.getName().equals(method)) 
-			{
-				return m;
-			}
-		}
-		return null;
+	    for (Method m : cl.getMethods()) if (m.getName().equals(method)) return m;
+	    return null;
+	}
+
+	public Field getField(Class<?> cl, String field) 
+	{
+	    for (Field f : cl.getFields()) if (f.getName().equals(field)) return f;
+	    return null;
+	}
+
+	public String getVersionString() 
+	{
+	    String packageName = plugin.getServer().getClass().getPackage().getName();
+	    String[] packageSplit = packageName.split("\\.");
+	    String version = packageSplit[(packageSplit.length - 1)];
+	    return version;
+	}
+
+	public void setValue(Object instance, String fieldName, Object value) throws Exception 
+	{
+	    Field field = instance.getClass().getDeclaredField(fieldName);
+	    field.setAccessible(true);
+	    field.set(instance, value);
+	}
+
+	public void sendPacket(Location l, Object packet) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException
+	{
+	    sendPacket(l, packet, 20);
+	}
+
+	public void sendPacket(Location l, Object packet, int radius) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException
+	{
+	    if (!getNearbyEntities(l, radius).isEmpty())
+	    {
+	    	for (Entity e : getNearbyEntities(l, 20))
+	    	{
+	    		if ((e != null) && ((e instanceof Player))) 
+	    		{
+	    			Player p = (Player)e;
+	    			sendPacket(p, packet);
+	    		}
+	        }
+	    }
+	}
+
+	public void sendPacket(Player p, Object packet) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException
+	{
+	    Object nmsPlayer = getMethod(p.getClass(), "getHandle").invoke(p, new Object[0]);
+	    Object con = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
+	    getMethod(con.getClass(), "sendPacket").invoke(con, new Object[] { packet });
+	}
+
+	public List<Entity> getNearbyEntities(Location l, int range) 
+	{
+	    List<Entity> entities = new ArrayList<>();
+	    
+	    for (Entity entity : l.getWorld().getEntities()) 
+	    {
+	    	if (isInBorder(l, entity.getLocation(), range)) 
+	    	{
+	    		entities.add(entity);
+	    	}
+	    }
+	    
+	    return entities;
+	}
+
+	public boolean isInBorder(Location center, Location l, int range)
+	{
+	    int x = center.getBlockX(); int z = center.getBlockZ();
+	    int x1 = l.getBlockX(); int z1 = l.getBlockZ();
+	    if ((x1 >= x + range) || (z1 >= z + range) || (x1 <= x - range) || (z1 <= z - range)) 
+	    {
+	    	return false;
+	    }
+	    
+	    return true;
 	}
 }

@@ -23,7 +23,7 @@ public class Main extends JavaPlugin
 		this.packet = new PacketHandler(this);
 		
 		//INFORMATION
-		getLogger().info("Version 0.8 by Codebucket");
+		getLogger().info("Version 0.9 by Codebucket");
 	}
 	
 	@Override
