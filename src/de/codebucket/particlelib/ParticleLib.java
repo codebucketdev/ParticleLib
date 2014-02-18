@@ -10,7 +10,6 @@ public class ParticleLib
 {
 	Main plugin;
 	PacketHandler packet;
-	
 	private static ParticleLib instance;
 	
 	public ParticleLib(Main plugin)
@@ -29,6 +28,45 @@ public class ParticleLib
 			{
 				packet.sendWorldPacket(player, location, particle);
 			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void playCustomParticle(Location location, ParticleRadius radius, Particle particle)
+	{
+		try 
+		{
+			for(Player player : location.getWorld().getPlayers())
+			{
+				packet.sendCustomPacket(player, location, radius, particle);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void playWorldParticle(Player player, Location location, Particle particle)
+	{
+		try 
+		{
+			packet.sendWorldPacket(player, location, particle);
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void playCustomParticle(Player player, Location location, ParticleRadius radius, Particle particle)
+	{
+		try 
+		{
+			packet.sendCustomPacket(player, location, radius, particle);
 		} 
 		catch (Exception e) 
 		{

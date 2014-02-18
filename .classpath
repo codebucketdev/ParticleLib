@@ -2,10 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre7"/>
-	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.5.1-R0.2.jar"/>
-	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.5.2-R1.0.jar"/>
-	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.6.1-R0.1-20130705.004223-11.jar"/>
-	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.6.2-R1.0.jar"/>
-	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.6.4-R0.1-20130923.182200-5.jar"/>
+	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/ProtocolLib-3.1.2.jar"/>
+	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.7.2-R0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

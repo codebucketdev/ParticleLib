@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,9 +16,15 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import com.comphenix.protocol.Packets;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+
 import de.codebucket.particlelib.Main;
 import de.codebucket.particlelib.Particle;
+import de.codebucket.particlelib.ParticleRadius;
 
+@SuppressWarnings("deprecation")
 public class PacketHandler 
 {
 	Main plugin;
@@ -29,54 +36,48 @@ public class PacketHandler
 	
 	public void sendWorldPacket(Player player, Location location, Particle particle) throws Exception
 	{
-		Object packet = java.lang.Class.forName("net.minecraft.server." + getVersionString() + ".Packet63WorldParticles").getConstructors()[0].newInstance(new Object[0]);
-		
-		setValue(packet, "a", particle.getParticleName());
-		setValue(packet, "b", Float.valueOf((float)location.getX()));
-		setValue(packet, "c", Float.valueOf((float)location.getY()));
-		setValue(packet, "d", Float.valueOf((float)location.getZ()));
-		setValue(packet, "e", Float.valueOf(new Random().nextFloat()));
-		setValue(packet, "f", Float.valueOf(new Random().nextFloat()));
-		setValue(packet, "g", Float.valueOf(new Random().nextFloat()));
-		setValue(packet, "h", Float.valueOf(particle.getDefaultSpeed()));
-		setValue(packet, "i", Integer.valueOf(particle.getParticleAmount()));
-		
+		PacketContainer packet = new PacketContainer(Packets.Server.WORLD_PARTICLES);
+		packet.getStrings().write(0, particle.getParticleName());
+		packet.getFloat().write(0, Float.valueOf((float)location.getX()));
+		packet.getFloat().write(1, Float.valueOf((float)location.getY()));
+		packet.getFloat().write(2, Float.valueOf((float)location.getZ()));
+		packet.getFloat().write(3, Float.valueOf(new Random().nextFloat()));
+		packet.getFloat().write(4, Float.valueOf(new Random().nextFloat()));
+		packet.getFloat().write(5, Float.valueOf(new Random().nextFloat()));
+		packet.getFloat().write(6, Float.valueOf(particle.getDefaultSpeed()));
+		packet.getIntegers().write(0, Integer.valueOf(particle.getParticleAmount()));
+		sendPacket(player, packet);
+	}
+	
+	public void sendCustomPacket(Player player, Location location, ParticleRadius radius, Particle particle) throws Exception
+	{
+		PacketContainer packet = new PacketContainer(Packets.Server.WORLD_PARTICLES);
+		packet.getStrings().write(0, particle.getParticleName());
+		packet.getFloat().write(0, Float.valueOf((float)location.getX()));
+		packet.getFloat().write(1, Float.valueOf((float)location.getY()));
+		packet.getFloat().write(2, Float.valueOf((float)location.getZ()));
+		packet.getFloat().write(3, Float.valueOf(radius.getX()));
+		packet.getFloat().write(4, Float.valueOf(radius.getY()));
+		packet.getFloat().write(5, Float.valueOf(radius.getZ()));
+		packet.getFloat().write(6, Float.valueOf(radius.getSpeed()));
+		packet.getIntegers().write(0, Integer.valueOf(radius.getAmount()));
 		sendPacket(player, packet);
 	}
 	
 	public void sendFireworkPacket(World world, Location location, FireworkEffect effect) throws Exception 
 	{
-		Method world_getHandle = null;
-		Method nms_world_broadcastEntityEffect = null;
-		Method firework_getHandle = null;
-		
-		Firework fw = (Firework) world.spawn(location, Firework.class);
-		Object nms_world = null;
-		Object nms_firework = null;
-		
-		if(world_getHandle == null) 
-		{
-			world_getHandle = getMethod(world.getClass(), "getHandle");
-			firework_getHandle = getMethod(fw.getClass(), "getHandle");
-		}
-		
-		nms_world = world_getHandle.invoke(world, (Object[]) null);
-		nms_firework = firework_getHandle.invoke(fw, (Object[]) null);
-		
-		if(nms_world_broadcastEntityEffect == null) 
-		{
-			nms_world_broadcastEntityEffect = getMethod(nms_world.getClass(), "broadcastEntityEffect");
-		}
-		
+		final Firework fw = (Firework) world.spawn(location, Firework.class);
 		FireworkMeta data = (FireworkMeta) fw.getFireworkMeta();
-		data.clearEffects();
-		data.setPower(1);
 		data.addEffect(effect);
-		fw.setFireworkMeta(data);
-		
-		nms_world_broadcastEntityEffect.invoke(nms_world, new Object[] {nms_firework, (byte) 17});
-		
-		fw.remove();
+		fw.setFireworkMeta(data);	
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
+		{
+			@Override
+			public void run()
+			{
+				fw.detonate();
+			}
+		}, 1L);
 	}
 	
 	public Method getMethod(Class<?> cl, String method)
@@ -106,12 +107,12 @@ public class PacketHandler
 	    field.set(instance, value);
 	}
 
-	public void sendPacket(Location l, Object packet) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException
+	public void sendPacket(Location l, PacketContainer packet) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException
 	{
 	    sendPacket(l, packet, 20);
 	}
 
-	public void sendPacket(Location l, Object packet, int radius) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException
+	public void sendPacket(Location l, PacketContainer packet, int radius) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException
 	{
 	    if (!getNearbyEntities(l, radius).isEmpty())
 	    {
@@ -126,11 +127,9 @@ public class PacketHandler
 	    }
 	}
 
-	public void sendPacket(Player p, Object packet) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException
+	public void sendPacket(Player p, PacketContainer packet) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException
 	{
-	    Object nmsPlayer = getMethod(p.getClass(), "getHandle").invoke(p, new Object[0]);
-	    Object con = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
-	    getMethod(con.getClass(), "sendPacket").invoke(con, new Object[] { packet });
+		ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
 	}
 
 	public List<Entity> getNearbyEntities(Location l, int range) 
