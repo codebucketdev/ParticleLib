@@ -24,6 +24,7 @@ public class ParticleLib
 	{
 		try 
 		{
+			if(!location.getChunk().isLoaded()) return;
 			for(Player player : location.getWorld().getPlayers())
 			{
 				packet.sendWorldPacket(player, location, particle);
@@ -39,6 +40,7 @@ public class ParticleLib
 	{
 		try 
 		{
+			if(!location.getChunk().isLoaded()) return;
 			for(Player player : location.getWorld().getPlayers())
 			{
 				packet.sendCustomPacket(player, location, radius, particle);
@@ -54,6 +56,7 @@ public class ParticleLib
 	{
 		try 
 		{
+			if(!location.getChunk().isLoaded()) return;
 			packet.sendWorldPacket(player, location, particle);
 		} 
 		catch (Exception e) 
@@ -66,6 +69,7 @@ public class ParticleLib
 	{
 		try 
 		{
+			if(!location.getChunk().isLoaded()) return;
 			packet.sendCustomPacket(player, location, radius, particle);
 		} 
 		catch (Exception e) 
@@ -78,6 +82,7 @@ public class ParticleLib
 	{
 		try 
 		{
+			if(!location.getChunk().isLoaded()) return;
 			packet.sendFireworkPacket(location.getWorld(), location, effect);
 		} 
 		catch (Exception e) 
