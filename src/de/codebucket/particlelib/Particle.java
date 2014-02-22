@@ -30,7 +30,7 @@ public enum Particle
 	VOID("townaura", 1.0F, 100),
 	BLOCK_BREAK("blockcrack", 0.1F, 100), 
 	BLOCK_DUST("blockdust", 0.1F, 100),
-    FIREWORKS_SPARK("fireworksSpark", 0.0F, 50),
+    FIREWORKS_SPARK("fireworksSpark", 0.0F, 30),
     FOOTSTEP("footstep", 0.0F, 1),
     LARGE_SMOKE("largesmoke", 0.0F, 1),
     ICONCRACK("iconcrack_", 0.0F, 1),
