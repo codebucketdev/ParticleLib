@@ -74,7 +74,6 @@ public class FireworkPacket
 			Object nms_player = getEntityHandle.invoke(player);
 			Object nms_connection = getPlayerConnection.get(nms_player);
 			sendPacket.invoke(nms_connection, packet);
-			System.out.println(player.getName() + " recieved packet.");
 		} 
 		catch (Exception e) 
 		{
