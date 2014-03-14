@@ -3,13 +3,15 @@ package de.codebucket.particlelib;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.codebucket.particlelib.packet.PacketHandler;
+import de.codebucket.particlelib.packet.FireworkPacket;
+import de.codebucket.particlelib.packet.ParticlePacket;
+import de.codebucket.particlelib.particle.ParticleLib;
 
-public class Main extends JavaPlugin
+public class ParticleLibary extends JavaPlugin
 {
-	ParticleLib api;
-	PacketHandler packet;
-	
+	private static ParticleLib api;
+	private static ParticlePacket particle;
+	private static FireworkPacket firework;
 	private String bukkitVersion = "UNKNOWN";
 	private String serverVersion = "UNKNOWN";
 	
@@ -19,17 +21,19 @@ public class Main extends JavaPlugin
 		//INITIALIZE
 		checkBukkitVersion();
 		checkServerVersion();
-		this.api = new ParticleLib(this);
-		this.packet = new PacketHandler(this);
+		api = new ParticleLib(this);
+		particle = new ParticlePacket(this);
+		firework = new FireworkPacket(this);
 		
 		//INFORMATION
-		getLogger().info("Version 0.9 by Codebucket");
+		getLogger().info("Version 1.1 by Codebucket");
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		
+		//INFORMATION
+		getLogger().info("Plugin disabled. Using ProtocolLib.");
 	}
 	
 	private void checkServerVersion()
@@ -60,6 +64,21 @@ public class Main extends JavaPlugin
 		version = version.replace(")", "");
 		version = version.split(" ")[2];
 		this.bukkitVersion = version;
+	}
+	
+	public static ParticlePacket getParticlePacket()
+	{
+		return particle;
+	}
+	
+	public static FireworkPacket getFireworkPacket()
+	{
+		return firework;
+	}
+	
+	public static ParticleLib getAPI()
+	{
+		return api;
 	}
 	
 	public String getBukkitVersion()

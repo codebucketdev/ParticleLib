@@ -1,6 +1,6 @@
-name: ParticleLib
+name: ParticleLibary
 author: Codebucket
-version: 0.9 Release
+version: 1.1 Release
 load: STARTUP
-main: de.codebucket.particlelib.Main
-website: http://www.dcminecraft.jimdo.de
+main: de.codebucket.particlelib.ParticleLibary
+website: http://www.codebucket.de

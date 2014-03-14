@@ -1,4 +1,4 @@
-package de.codebucket.particlelib;
+package de.codebucket.particlelib.particle;
 
 public enum Particle 
 {
