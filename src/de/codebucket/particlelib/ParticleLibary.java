@@ -33,7 +33,7 @@ public class ParticleLibary extends JavaPlugin
 	public void onDisable()
 	{
 		//INFORMATION
-		getLogger().info("Plugin disabled. Using ProtocolLib.");
+		getLogger().info("Plugin disabled. Using Reflection.");
 	}
 	
 	private void checkServerVersion()
