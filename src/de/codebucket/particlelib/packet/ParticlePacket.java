@@ -39,7 +39,7 @@ public class ParticlePacket
 		}
 	}
 	
-	private Object instantiatePacket(String name, Location loc, float offsetX, float offsetY, float offsetZ, float speed, int amount)
+	private Object createParticlePacket(String name, Location loc, float offsetX, float offsetY, float offsetZ, float speed, int amount)
 	{
 		if (amount < 1)
 			throw new PacketInstantiationException("Amount cannot be lower than 1");
@@ -54,19 +54,19 @@ public class ParticlePacket
 		}
 	}
 
-	private Object instantiateIconCrackPacket(int id, Location loc, float offsetX, float offsetY, float offsetZ, float speed, int amount)
+	private Object createIconCrackPacket(int id, Location loc, float offsetX, float offsetY, float offsetZ, float speed, int amount)
 	{
-		return instantiatePacket("iconcrack_" + id, loc, offsetX, offsetY, offsetZ, speed, amount);
+		return createParticlePacket("iconcrack_" + id, loc, offsetX, offsetY, offsetZ, speed, amount);
 	}
 	
-	private Object instantiateBlockCrackPacket(int id, byte data, Location loc, float offsetX, float offsetY, float offsetZ, int amount)
+	private Object createBlockCrackPacket(int id, byte data, Location loc, float offsetX, float offsetY, float offsetZ, int amount)
 	{
-		return instantiatePacket("blockcrack_" + id + "_" + data, loc, offsetX, offsetY, offsetZ, 0, amount);
+		return createParticlePacket("blockcrack_" + id + "_" + data, loc, offsetX, offsetY, offsetZ, 0, amount);
 	}
 	
-	private Object instantiateBlockDustPacket(int id, byte data, Location loc, float offsetX, float offsetY, float offsetZ, float speed, int amount)
+	private Object createBlockDustPacket(int id, byte data, Location loc, float offsetX, float offsetY, float offsetZ, float speed, int amount)
 	{
-		return instantiatePacket("blockdust_" + id + "_" + data, loc, offsetX, offsetY, offsetZ, speed, amount);
+		return createParticlePacket("blockdust_" + id + "_" + data, loc, offsetX, offsetY, offsetZ, speed, amount);
 	}
 
 	private void sendPacket(Player p, Object packet)
@@ -88,7 +88,7 @@ public class ParticlePacket
 		float offsetZ = new Random().nextFloat();
 		float speed = particle.getDefaultSpeed();
 		int amount = particle.getParticleAmount();
-		sendPacket(p, instantiatePacket(particle.getParticleName(), loc, offsetX, offsetY, offsetZ, speed, amount));
+		sendPacket(p, createParticlePacket(particle.getParticleName(), loc, offsetX, offsetY, offsetZ, speed, amount));
 	}
 
 	public void sendParticlePacket(Player p, Location loc, ParticleRadius radius, Particle particle) throws Exception
@@ -98,7 +98,7 @@ public class ParticlePacket
 		float offsetZ = radius.getZ();
 		float speed = radius.getSpeed();
 		int amount = radius.getAmount();
-		sendPacket(p, instantiatePacket(particle.getParticleName(), loc, offsetX, offsetY, offsetZ, speed, amount));
+		sendPacket(p, createParticlePacket(particle.getParticleName(), loc, offsetX, offsetY, offsetZ, speed, amount));
 	}
 	
 	public void sendIconCrackPacket(Player p, Location loc, int id, ParticleRadius radius)
@@ -108,26 +108,26 @@ public class ParticlePacket
 		float offsetZ = radius.getZ();
 		float speed = radius.getSpeed();
 		int amount = radius.getAmount();
-		sendPacket(p, instantiateIconCrackPacket(id, loc, offsetX, offsetY, offsetZ, speed, amount));
+		sendPacket(p, createIconCrackPacket(id, loc, offsetX, offsetY, offsetZ, speed, amount));
 	}
 	
-	public void displayBlockCrack(Player p, Location loc, int id, byte data, ParticleRadius radius) 
+	public void sendBlockCrackPacket(Player p, Location loc, int id, byte data, ParticleRadius radius) 
 	{
 		float offsetX = radius.getX();
 		float offsetY = radius.getY();
 		float offsetZ = radius.getZ();
 		int amount = radius.getAmount();
-		sendPacket(p, instantiateBlockCrackPacket(id, data, loc, offsetX, offsetY, offsetZ, amount));
+		sendPacket(p, createBlockCrackPacket(id, data, loc, offsetX, offsetY, offsetZ, amount));
 	}
 	
-	public void displayBlockDust(Player p, Location loc, int id, byte data, ParticleRadius radius)
+	public void sendBlockDustPacket(Player p, Location loc, int id, byte data, ParticleRadius radius)
 	{
 		float offsetX = radius.getX();
 		float offsetY = radius.getY();
 		float offsetZ = radius.getZ();
 		float speed = radius.getSpeed();
 		int amount = radius.getAmount();
-		sendPacket(p, instantiateBlockDustPacket(id, data, loc, offsetX, offsetY, offsetZ, speed, amount));
+		sendPacket(p, createBlockDustPacket(id, data, loc, offsetX, offsetY, offsetZ, speed, amount));
 	}
 	
 	private static final class PacketInstantiationException extends RuntimeException

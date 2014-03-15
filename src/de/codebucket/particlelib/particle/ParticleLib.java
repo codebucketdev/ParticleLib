@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import de.codebucket.particlelib.ParticleLibary;
 
@@ -26,7 +28,7 @@ public class ParticleLib
 	{
 		try 
 		{
-			for(Player player : getPlayersInRange(location, 16))
+			for(Player player : getPlayersInRange(location, 20))
 			{
 				ParticleLibary.getParticlePacket().sendParticlePacket(player, location, particle);
 			}
@@ -41,7 +43,7 @@ public class ParticleLib
 	{
 		try 
 		{
-			for(Player player : getPlayersInRange(location, 16))
+			for(Player player : getPlayersInRange(location, 20))
 			{
 				ParticleLibary.getParticlePacket().sendParticlePacket(player, location, radius, particle);
 			}
@@ -56,7 +58,7 @@ public class ParticleLib
 	{
 		try 
 		{
-			if(isPlayerInRange(player, location, 16))
+			if(isPlayerInRange(player, location, 20))
 			{
 				ParticleLibary.getParticlePacket().sendParticlePacket(player, location, particle);
 			}
@@ -71,7 +73,7 @@ public class ParticleLib
 	{
 		try 
 		{
-			if(isPlayerInRange(player, location, 16))
+			if(isPlayerInRange(player, location, 20))
 			{
 				ParticleLibary.getParticlePacket().sendParticlePacket(player, location, radius, particle);
 			}
@@ -104,6 +106,102 @@ public class ParticleLib
 			if(isPlayerInRange(player, location, 60))
 			{
 				ParticleLibary.getFireworkPacket().sendFireworkPacket(player, location, effect);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	@Deprecated
+	public void playIconCrack(Location location, ItemStack item, ParticleRadius radius)
+	{
+		try 
+		{
+			for(Player player : getPlayersInRange(location, 20))
+			{
+				ParticleLibary.getParticlePacket().sendIconCrackPacket(player, location, item.getType().getId(), radius);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	@Deprecated
+	public void playBlockCrack(Location location, MaterialData data, ParticleRadius radius)
+	{
+		try 
+		{
+			for(Player player : getPlayersInRange(location, 20))
+			{
+				ParticleLibary.getParticlePacket().sendBlockCrackPacket(player, location, data.getItemType().getId(), data.getData(), radius);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	@Deprecated
+	public void playBlockDust(Location location, MaterialData data, ParticleRadius radius)
+	{
+		try 
+		{
+			for(Player player : getPlayersInRange(location, 20))
+			{
+				ParticleLibary.getParticlePacket().sendBlockDustPacket(player, location, data.getItemType().getId(), data.getData(), radius);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	@Deprecated
+	public void playIconCrack(Player player, Location location, ItemStack item, ParticleRadius radius)
+	{
+		try 
+		{
+			if(isPlayerInRange(player, location, 20))
+			{
+				ParticleLibary.getParticlePacket().sendIconCrackPacket(player, location, item.getType().getId(), radius);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	@Deprecated
+	public void playBlockCrack(Player player, Location location, MaterialData data, ParticleRadius radius)
+	{
+		try 
+		{
+			if(isPlayerInRange(player, location, 20))
+			{
+				ParticleLibary.getParticlePacket().sendBlockCrackPacket(player, location, data.getItemType().getId(), data.getData(), radius);
+			}
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	@Deprecated
+	public void playBlockDust(Player player, Location location, MaterialData data, ParticleRadius radius)
+	{
+		try 
+		{
+			if(isPlayerInRange(player, location, 20))
+			{
+				ParticleLibary.getParticlePacket().sendBlockDustPacket(player, location, data.getItemType().getId(), data.getData(), radius);
 			}
 		} 
 		catch (Exception e) 
