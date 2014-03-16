@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import de.codebucket.particlelib.ParticleLibary;
 
@@ -39,10 +40,17 @@ public class FireworkPacket
 		}
 	}
 
-	public void sendFireworkPacket(Player p, Location loc, FireworkEffect fe) 
+	public void sendFireworkPacket(final Player p, Location loc, FireworkEffect fe) 
 	{
-		Object packet = createPacket(loc, fe);
-		sendPacket(packet, p);
+		final Object packet = createPacket(loc, fe);
+		Bukkit.getScheduler().runTaskLater(plugin, new BukkitRunnable()
+		{
+			@Override
+			public void run() 
+			{
+				sendPacket(packet, p);
+			}
+		}, 1L);
 	}
 
 	private Object createPacket(Location loc, FireworkEffect fe) 
