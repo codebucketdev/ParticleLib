@@ -7,10 +7,10 @@ import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import de.codebucket.particlelib.ParticleLibary;
 
@@ -42,40 +42,45 @@ public class FireworkPacket
 
 	public void sendFireworkPacket(final Player p, Location loc, FireworkEffect fe) 
 	{
-		final Object packet = createPacket(loc, fe);
-		Bukkit.getScheduler().runTaskLater(plugin, new BukkitRunnable()
+		final Firework firework = createFirework(loc, fe);
+		final Object packet = createPacket(firework);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
 			@Override
 			public void run() 
 			{
 				sendPacket(packet, p);
+				firework.remove();
 			}
-		}, 1L);
+		}, 3L);		
 	}
-
-	private Object createPacket(Location loc, FireworkEffect fe) 
+	
+	private Firework createFirework(Location loc, FireworkEffect fe)
 	{
-		try 
-		{
-			Firework firework = loc.getWorld().spawn(loc, Firework.class);
-			FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
-			data.clearEffects();
-			data.setPower(1);
-			data.addEffect(fe);
-			firework.setFireworkMeta(data);
-			Object nms_firework = null;
-			nms_firework = getFireworkHandle.invoke(firework);
-			firework.remove();
-			return packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
-		} 
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return null;
+		Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
+		data.clearEffects();
+		data.setPower(1);
+		data.addEffect(fe);
+		firework.setFireworkMeta(data);
+		return firework;
 	}
 
-	private void sendPacket(Object packet, Player player) 
+	private Object createPacket(Firework firework) 
+	{
+		 try
+		 {
+			 Object nms_firework = null;
+			 nms_firework = getFireworkHandle.invoke(firework);
+			 return packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
+		 } 
+		 catch (Exception e) 
+		 {
+			 return createPacket(firework);
+		 }
+	}
+
+	private void sendPacket(final Object packet, Player player) 
 	{
 		try 
 		{
@@ -85,7 +90,7 @@ public class FireworkPacket
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			sendPacket(packet, player);
 		}
 	}
 
