@@ -52,7 +52,7 @@ public class FireworkPacket
 				sendPacket(packet, p);
 				firework.remove();
 			}
-		}, 3L);		
+		}, 2L);		
 	}
 	
 	private Firework createFirework(Location loc, FireworkEffect fe)
