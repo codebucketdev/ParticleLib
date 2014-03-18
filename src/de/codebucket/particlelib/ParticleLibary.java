@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.codebucket.particlelib.packet.FireworkPacket;
 import de.codebucket.particlelib.packet.ParticlePacket;
 import de.codebucket.particlelib.particle.ParticleLib;
-import de.codebucket.particlelib.protocol.ParticlePacketFix;
 import de.codebucket.particlelib.protocol.SoundPacketFix;
 
 public class ParticleLibary extends JavaPlugin
