@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.codebucket.particlelib.packet.FireworkPacket;
 import de.codebucket.particlelib.packet.ParticlePacket;
 import de.codebucket.particlelib.particle.ParticleLib;
+import de.codebucket.particlelib.protocol.ParticlePacketFix;
 import de.codebucket.particlelib.protocol.SoundPacketFix;
 
 public class ParticleLibary extends JavaPlugin
@@ -27,9 +28,9 @@ public class ParticleLibary extends JavaPlugin
 		firework = new FireworkPacket(this);
 		
 		//FIREWORK SOUND FIX
-		if(getServer().getPluginManager().getPlugin("ProtocolLib") != null || getServer().getPluginManager().getPlugin("ProtocolLib").isEnabled())
+		if(getServer().getPluginManager().getPlugin("ProtocolLib") != null && getServer().getPluginManager().getPlugin("ProtocolLib").isEnabled())
 		{
-			SoundPacketFix.registerSound(this, "fireworks.launch1");
+			 SoundPacketFix.registerSound(this, "fireworks.launch");
 		}
 		
 		//INFORMATION

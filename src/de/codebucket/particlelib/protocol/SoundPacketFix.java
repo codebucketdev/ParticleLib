@@ -11,7 +11,7 @@ import com.comphenix.protocol.events.PacketEvent;
 @SuppressWarnings("deprecation")
 public class SoundPacketFix 
 {
-	public static void registerSound(Plugin plugin, final String soundname)
+	public static void registerSound(final Plugin plugin, final String soundname)
 	{
 		ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ConnectionSide.SERVER_SIDE, Packets.Server.NAMED_SOUND_EFFECT)
 		{
