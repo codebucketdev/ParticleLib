@@ -15,7 +15,6 @@ public class ParticleLibary extends JavaPlugin
 	private static FireworkPacket firework;
 	private String bukkitVersion = "UNKNOWN";
 	private String serverVersion = "UNKNOWN";
-	private SoundPacketFix soundFix = null;
 	
 	@Override
 	public void onEnable() 
@@ -30,8 +29,7 @@ public class ParticleLibary extends JavaPlugin
 		//FIREWORK SOUND FIX
 		if(getServer().getPluginManager().getPlugin("ProtocolLib") != null || getServer().getPluginManager().getPlugin("ProtocolLib").isEnabled())
 		{
-			soundFix = new SoundPacketFix(this);
-			soundFix.registerSound("fireworks.launch1");
+			SoundPacketFix.registerSound(this, "fireworks.launch1");
 		}
 		
 		//INFORMATION
@@ -41,12 +39,6 @@ public class ParticleLibary extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
-		//FIREWORK SOUND FIX
-		if(soundFix != null)
-		{
-			soundFix.unregisterSound("fireworks.launch1");
-		}
-		
 		//INFORMATION
 		getLogger().info("Plugin disabled. Using Reflection.");
 	}

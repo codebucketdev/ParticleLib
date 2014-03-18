@@ -1,51 +1,29 @@
 package de.codebucket.particlelib.protocol;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.plugin.Plugin;
 
+import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ConnectionSide;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
 
+@SuppressWarnings("deprecation")
 public class SoundPacketFix 
 {
-	private Plugin plugin;
-	private List<SoundPacketListener> listeners;
-	
-	public SoundPacketFix(Plugin plugin)
+	public static void registerSound(Plugin plugin, final String soundname)
 	{
-		this.plugin = plugin;
-		this.listeners = new ArrayList<>();
-	}
-	
-	public void registerSound(String soundname)
-	{
-		SoundPacketListener listener = new SoundPacketListener(plugin, soundname);
-		ProtocolLibrary.getProtocolManager().addPacketListener(listener);
-		listeners.add(listener);
-	}
-	
-	public void unregisterSound(String soundname)
-	{
-		for(SoundPacketListener listener : listeners)
+		ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ConnectionSide.SERVER_SIDE, Packets.Server.NAMED_SOUND_EFFECT)
 		{
-			if(listener.getSoundname().equals(soundname))
+			@Override
+			public void onPacketSending(PacketEvent event) 
 			{
-				ProtocolLibrary.getProtocolManager().removePacketListener(listener);
-			}
-		}
-	}
-	
-	public void unregisterSounds()
-	{
-		for(SoundPacketListener listener : listeners)
-		{
-			ProtocolLibrary.getProtocolManager().removePacketListener(listener);
-		}
-	}
-	
-	public List<SoundPacketListener> getListeners()
-	{
-		return listeners;
+				String sound = event.getPacket().getStrings().read(0);
+				if (soundname.equalsIgnoreCase(sound))
+				{
+					event.setCancelled(true);
+				}
+			}		
+		});
 	}
 }
