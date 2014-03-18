@@ -1,5 +1,6 @@
 package de.codebucket.particlelib.protocol;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.plugin.Plugin;
@@ -14,6 +15,7 @@ public class SoundPacketFix
 	public SoundPacketFix(Plugin plugin)
 	{
 		this.plugin = plugin;
+		this.listeners = new ArrayList<>();
 	}
 	
 	public void registerSound(String soundname)

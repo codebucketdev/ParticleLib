@@ -18,16 +18,14 @@ public class SoundPacketListener implements PacketListener
 	}
 	
 	@Override
-    public void onPacketSending(PacketEvent event) 
-    {
-        // You don't really need to check the packet ID unless you register 
-        // multiple packet listeners
-        String sound = event.getPacket().getStrings().read(0);
-        if (soundname.equals(sound))
-        {
-            event.setCancelled(true);
-        }
-    }
+	public void onPacketSending(PacketEvent event)
+	{
+		String sound = event.getPacket().getStrings().read(0);
+		if (getSoundname().equals(sound)) 
+		{
+			event.setCancelled(true);
+		}
+	}
 	
 	@Override
 	public void onPacketReceiving(PacketEvent pe) 
