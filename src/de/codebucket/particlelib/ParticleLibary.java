@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.codebucket.particlelib.packet.FireworkPacket;
 import de.codebucket.particlelib.packet.ParticlePacket;
 import de.codebucket.particlelib.particle.ParticleLib;
+import de.codebucket.particlelib.protocol.SoundPacketFix;
 
 public class ParticleLibary extends JavaPlugin
 {
@@ -14,6 +15,7 @@ public class ParticleLibary extends JavaPlugin
 	private static FireworkPacket firework;
 	private String bukkitVersion = "UNKNOWN";
 	private String serverVersion = "UNKNOWN";
+	private SoundPacketFix soundFix = null;
 	
 	@Override
 	public void onEnable() 
@@ -25,13 +27,26 @@ public class ParticleLibary extends JavaPlugin
 		particle = new ParticlePacket(this);
 		firework = new FireworkPacket(this);
 		
+		//FIREWORK SOUND FIX
+		if(getServer().getPluginManager().getPlugin("ProtocolLib") != null || getServer().getPluginManager().getPlugin("ProtocolLib").isEnabled())
+		{
+			soundFix = new SoundPacketFix(this);
+			soundFix.registerSound("fireworks.launch1");
+		}
+		
 		//INFORMATION
-		getLogger().info("Version 1.1 by Codebucket");
+		getLogger().info("Version 1.2 by Codebucket");
 	}
 	
 	@Override
 	public void onDisable()
 	{
+		//FIREWORK SOUND FIX
+		if(soundFix != null)
+		{
+			soundFix.unregisterSound("fireworks.launch1");
+		}
+		
 		//INFORMATION
 		getLogger().info("Plugin disabled. Using Reflection.");
 	}

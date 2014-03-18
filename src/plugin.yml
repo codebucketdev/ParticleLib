@@ -1,6 +1,7 @@
 name: ParticleLib
 author: Codebucket
-version: 1.1 Release
+version: 1.2 Release
 load: STARTUP
 main: de.codebucket.particlelib.ParticleLibary
 website: http://www.codebucket.de
+softdepend: [ProtocolLib]
