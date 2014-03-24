@@ -60,9 +60,9 @@ public class FireworkPacket
 			FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
 			data.clearEffects();
 			data.addEffect(fe);
-			data.setPower(3);
+			data.setPower(1);
 			firework.setFireworkMeta(data);
-			firework.teleport(loc);
+			Thread.sleep(15L);
 			nms_firework = getFireworkHandle.invoke(firework);
 			Object packet = packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
 			firework.remove();
