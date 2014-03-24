@@ -41,31 +41,30 @@ public class FireworkPacket
 
 	public void sendFireworkPacket(final Player player, final Location loc, final FireworkEffect fe) 
 	{
-		Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() 
-		{
-			@Override
-			public void run() 
-			{
-				sendPacket(player, createFireworkPacket(loc, fe));
-			}
-		}, 1L);
+		Firework firework = createFirework(loc, fe);
+		Object packet = createPacket(firework);
+		sendPacket(player, packet);
+		firework.remove();
 	}
 	
-	private Object createFireworkPacket(Location loc, FireworkEffect fe)
+	private Firework createFirework(Location loc, FireworkEffect fe)
+	{
+		Firework firework = loc.getWorld().spawn(loc, Firework.class);
+		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
+		data.clearEffects();
+		data.addEffect(fe);
+		data.setPower(0);
+		firework.setFireworkMeta(data);
+		return firework;
+	}
+	
+	private Object createPacket(Firework fw)
 	{
 		try
 		{
 			Object nms_firework = null;
-			Firework firework = loc.getWorld().spawn(loc, Firework.class);
-			FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
-			data.clearEffects();
-			data.addEffect(fe);
-			data.setPower(1);
-			firework.setFireworkMeta(data);
-			Thread.sleep(15L);
-			nms_firework = getFireworkHandle.invoke(firework);
+			nms_firework = getFireworkHandle.invoke(fw);
 			Object packet = packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
-			firework.remove();
 			return packet;
 		}
 		catch(Exception e)
