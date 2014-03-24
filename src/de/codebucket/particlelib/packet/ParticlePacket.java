@@ -69,15 +69,15 @@ public class ParticlePacket
 		return createParticlePacket("blockdust_" + id + "_" + data, loc, offsetX, offsetY, offsetZ, speed, amount);
 	}
 
-	private void sendPacket(Player p, Object packet)
+	private void sendPacket(Player player, Object packet)
 	{
 		try
 		{
-			sendPacket.invoke(playerConnection.get(getHandle.invoke(p)), packet);
+			sendPacket.invoke(playerConnection.get(getHandle.invoke(player)), packet);
 		}
 		catch (Exception e) 
 		{
-			throw new PacketSendingException("Failed to send a packet to player '" + p.getName() + "'",  e);
+			throw new PacketSendingException("Failed to send a packet to player '" + player.getName() + "'",  e);
 		}
 	}
 	
@@ -130,28 +130,4 @@ public class ParticlePacket
 		sendPacket(p, createBlockDustPacket(id, data, loc, offsetX, offsetY, offsetZ, speed, amount));
 	}
 	
-	private static final class PacketInstantiationException extends RuntimeException
-	{
-		private static final long serialVersionUID = 3203085387160737484L;
-
-		public PacketInstantiationException(String message) 
-		{
-			super(message);
-		}
-
-		public PacketInstantiationException(String message, Throwable cause)
-		{
-			super(message, cause);
-		}
-	}
-	
-	private static final class PacketSendingException extends RuntimeException
-	{
-		private static final long serialVersionUID = 3203085387160737484L;
-		
-		public PacketSendingException(String message, Throwable cause)
-		{
-			super(message, cause);
-		}
-	}
 }
