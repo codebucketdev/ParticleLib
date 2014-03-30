@@ -18,9 +18,9 @@ public class FireworkPacket
 	ParticleLibary plugin;
 	private Constructor<?> packetPlayOutEntityStatus;
 	private Method getEntityHandle;
+	private Method getFireworkHandle;
 	private Field getPlayerConnection;
 	private Method sendPacket;
-	private Method getFireworkHandle;
 
 	public FireworkPacket(ParticleLibary plugin)
 	{
@@ -29,9 +29,9 @@ public class FireworkPacket
 			this.plugin = plugin;
 			packetPlayOutEntityStatus = getMCClass("PacketPlayOutEntityStatus").getConstructor(getMCClass("Entity"), byte.class);
 			getEntityHandle = getCraftClass("entity.CraftPlayer").getMethod("getHandle");
+			getFireworkHandle = getCraftClass("entity.CraftEntity").getMethod("getHandle");
 			getPlayerConnection = getMCClass("EntityPlayer").getDeclaredField("playerConnection");
 			sendPacket = getMCClass("PlayerConnection").getMethod("sendPacket", getMCClass("Packet"));
-			getFireworkHandle = getCraftClass("entity.CraftEntity").getMethod("getHandle");
 		} 
 		catch (Exception e) 
 		{
@@ -39,35 +39,35 @@ public class FireworkPacket
 		}
 	}
 
-	public void sendFireworkPacket(final Player player, final Location loc, final FireworkEffect fe) 
-	{
-		Firework firework = createFirework(loc, fe);
-		Object packet = createPacket(firework);
-		sendPacket(player, packet);
-		firework.remove();
-	}
-	
-	private Firework createFirework(Location loc, FireworkEffect fe)
-	{
-		Firework firework = loc.getWorld().spawn(loc, Firework.class);
-		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
-		data.clearEffects();
-		data.addEffect(fe);
-		data.setPower(0);
-		firework.setFireworkMeta(data);
-		return firework;
-	}
-	
-	private Object createPacket(Firework fw)
+	public void sendFireworkPacket(final Player player, final Location loc, final FireworkEffect fe)
 	{
 		try
 		{
+			Firework fw = loc.getWorld().spawn(loc, Firework.class);
+			FireworkMeta data = (FireworkMeta) fw.getFireworkMeta();
+			data.clearEffects();
+			data.addEffect(fe);
+			data.setPower(3);
+			fw.setFireworkMeta(data);
+			Thread.sleep(0L, 5);
+			
 			Object nms_firework = null;
 			nms_firework = getFireworkHandle.invoke(fw);
-			Object packet = packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
-			return packet;
+			Object epacket = packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
+			sendPacket(player, epacket);
+			
+			Class<?> packetPlayOutEntityDestroy = getMCClass("PacketPlayOutEntityDestroy");
+			Object dpacket = packetPlayOutEntityDestroy.newInstance();
+			Field a = packetPlayOutEntityDestroy.getDeclaredField("a");
+			a.setAccessible(true);
+			a.set(dpacket, new int[] { fw.getEntityId() });
+			for(Player pl : fw.getWorld().getPlayers())
+				sendPacket(pl, dpacket);
+			
+			fw.teleport(fw.getLocation().subtract(0.0, 128.0, 0.0));
+			fw.remove();
 		}
-		catch(Exception e)
+		catch (Exception e) 
 		{
 			throw new PacketInstantiationException("Packet instantiation failed", e);
 		}
