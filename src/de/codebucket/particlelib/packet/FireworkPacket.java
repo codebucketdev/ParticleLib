@@ -47,9 +47,8 @@ public class FireworkPacket
 			FireworkMeta data = (FireworkMeta) fw.getFireworkMeta();
 			data.clearEffects();
 			data.addEffect(fe);
-			data.setPower(3);
+			data.setPower(0);
 			fw.setFireworkMeta(data);
-			Thread.sleep(0L, 5);
 			
 			Object nms_firework = null;
 			nms_firework = getFireworkHandle.invoke(fw);
@@ -65,7 +64,6 @@ public class FireworkPacket
 				sendPacket(pl, dpacket);
 			
 			fw.teleport(fw.getLocation().subtract(0.0, 128.0, 0.0));
-			fw.remove();
 		}
 		catch (Exception e) 
 		{
@@ -77,7 +75,9 @@ public class FireworkPacket
 	{
 		try
 		{
-			sendPacket.invoke(getPlayerConnection.get(getEntityHandle.invoke(player)), packet);
+			Object nms_player = getEntityHandle.invoke(player);
+			Object nms_connection = getPlayerConnection.get(nms_player);
+			sendPacket.invoke(nms_connection, packet);
 		}
 		catch (Exception e) 
 		{
