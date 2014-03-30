@@ -1,6 +1,5 @@
 package de.codebucket.particlelib.packet;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -16,8 +15,8 @@ import de.codebucket.particlelib.ParticleLibary;
 public class FireworkPacket
 {
 	ParticleLibary plugin;
-	private Constructor<?> packetPlayOutEntityStatus;
-	private Method getEntityHandle;
+	private Class<?> packetPlayOutEntityDestroy;
+	private Method getPlayerHandle;
 	private Method getFireworkHandle;
 	private Field getPlayerConnection;
 	private Method sendPacket;
@@ -27,9 +26,9 @@ public class FireworkPacket
 		try 
 		{
 			this.plugin = plugin;
-			packetPlayOutEntityStatus = getMCClass("PacketPlayOutEntityStatus").getConstructor(getMCClass("Entity"), byte.class);
-			getEntityHandle = getCraftClass("entity.CraftPlayer").getMethod("getHandle");
-			getFireworkHandle = getCraftClass("entity.CraftEntity").getMethod("getHandle");
+			packetPlayOutEntityDestroy = getMCClass("PacketPlayOutEntityDestroy");
+			getPlayerHandle = getCraftClass("entity.CraftPlayer").getMethod("getHandle");
+			getFireworkHandle = getCraftClass("entity.CraftFirework").getMethod("getHandle");
 			getPlayerConnection = getMCClass("EntityPlayer").getDeclaredField("playerConnection");
 			sendPacket = getMCClass("PlayerConnection").getMethod("sendPacket", getMCClass("Packet"));
 		} 
@@ -39,7 +38,7 @@ public class FireworkPacket
 		}
 	}
 
-	public void sendFireworkPacket(final Player player, final Location loc, final FireworkEffect fe)
+	public void sendFireworkPacket(Player player, Location loc, FireworkEffect fe)
 	{
 		try
 		{
@@ -50,24 +49,37 @@ public class FireworkPacket
 			data.setPower(0);
 			fw.setFireworkMeta(data);
 			
-			Object nms_firework = null;
-			nms_firework = getFireworkHandle.invoke(fw);
-			Object epacket = packetPlayOutEntityStatus.newInstance(nms_firework, (byte) 17);
-			sendPacket(player, epacket);
-			
-			Class<?> packetPlayOutEntityDestroy = getMCClass("PacketPlayOutEntityDestroy");
 			Object dpacket = packetPlayOutEntityDestroy.newInstance();
 			Field a = packetPlayOutEntityDestroy.getDeclaredField("a");
 			a.setAccessible(true);
 			a.set(dpacket, new int[] { fw.getEntityId() });
 			for(Player pl : fw.getWorld().getPlayers())
-				sendPacket(pl, dpacket);
-			
-			fw.teleport(fw.getLocation().subtract(0.0, 128.0, 0.0));
+			{
+				if(!pl.equals(player)) sendPacket(pl, dpacket);
+			}
+			detonateFirework(fw);
 		}
 		catch (Exception e) 
 		{
 			throw new PacketInstantiationException("Packet instantiation failed", e);
+		}
+	}
+	
+	public void detonateFirework(Firework fw)
+	{
+		try
+		{
+			Object nms_firework = getFireworkHandle.invoke(fw, (Object[]) null);
+			Field a = nms_firework.getClass().getDeclaredField("ticksFlown");
+			a.setAccessible(true);
+			a.set(nms_firework, Integer.parseInt("3"));
+			Field b = nms_firework.getClass().getDeclaredField("expectedLifespan");
+			b.setAccessible(true);
+			b.set(nms_firework, Integer.parseInt("-1"));
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -75,9 +87,7 @@ public class FireworkPacket
 	{
 		try
 		{
-			Object nms_player = getEntityHandle.invoke(player);
-			Object nms_connection = getPlayerConnection.get(nms_player);
-			sendPacket.invoke(nms_connection, packet);
+			sendPacket.invoke(getPlayerConnection.get(getPlayerHandle.invoke(player)), packet);
 		}
 		catch (Exception e) 
 		{
