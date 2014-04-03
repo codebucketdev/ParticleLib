@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre7"/>
 	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/ProtocolLib-3.1.2.jar"/>
 	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/craftbukkit-1.7.2-R0.2.jar"/>
+	<classpathentry kind="lib" path="F:/Server/Developement/Eclipse/DisguiseLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

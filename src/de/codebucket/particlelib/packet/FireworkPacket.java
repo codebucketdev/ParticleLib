@@ -37,8 +37,8 @@ public class FireworkPacket
 			e.printStackTrace();
 		}
 	}
-
-	public void sendFireworkPacket(Player player, Location loc, FireworkEffect fe)
+	
+	public void sendFireworkPacket(Location loc, FireworkEffect fe)
 	{
 		try
 		{
@@ -48,7 +48,24 @@ public class FireworkPacket
 			data.addEffect(fe);
 			data.setPower(0);
 			fw.setFireworkMeta(data);
-			
+			detonateFirework(fw);
+		}
+		catch (Exception e) 
+		{
+			throw new PacketInstantiationException("Packet instantiation failed", e);
+		}
+	}
+
+	public void sendFireworkPacket(final Player player, Location loc, FireworkEffect fe)
+	{
+		try
+		{
+			Firework fw = loc.getWorld().spawn(loc, Firework.class);
+			FireworkMeta data = (FireworkMeta) fw.getFireworkMeta();
+			data.clearEffects();
+			data.addEffect(fe);
+			data.setPower(0);
+			fw.setFireworkMeta(data);
 			Object dpacket = packetPlayOutEntityDestroy.newInstance();
 			Field a = packetPlayOutEntityDestroy.getDeclaredField("a");
 			a.setAccessible(true);
@@ -69,13 +86,13 @@ public class FireworkPacket
 	{
 		try
 		{
-			Object nms_firework = getFireworkHandle.invoke(fw, (Object[]) null);
+			Object nms_firework = getFireworkHandle.invoke(fw);
 			Field a = nms_firework.getClass().getDeclaredField("ticksFlown");
 			a.setAccessible(true);
-			a.set(nms_firework, Integer.parseInt("3"));
+			a.set(nms_firework, 2);
 			Field b = nms_firework.getClass().getDeclaredField("expectedLifespan");
 			b.setAccessible(true);
-			b.set(nms_firework, Integer.parseInt("-1"));
+			b.set(nms_firework, 3);
 		}
 		catch (Exception e) 
 		{

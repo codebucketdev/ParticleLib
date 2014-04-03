@@ -88,10 +88,7 @@ public class ParticleLib
 	{
 		try 
 		{
-			for(Player player : getPlayersInRange(location, 60))
-			{
-				ParticleLibary.getFireworkPacket().sendFireworkPacket(player, location, effect);
-			}
+			ParticleLibary.getFireworkPacket().sendFireworkPacket(location, effect);
 		} 
 		catch (Exception e) 
 		{
@@ -103,10 +100,7 @@ public class ParticleLib
 	{
 		try 
 		{
-			if(isPlayerInRange(player, location, 60))
-			{
-				ParticleLibary.getFireworkPacket().sendFireworkPacket(player, location, effect);
-			}
+			ParticleLibary.getFireworkPacket().sendFireworkPacket(player, location, effect);
 		} 
 		catch (Exception e) 
 		{
